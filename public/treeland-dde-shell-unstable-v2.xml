@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="treeland_dde_shell_unstable_v2">
+    <copyright><![CDATA[
+    SPDX-FileCopyrightText: 2024 - 2026 UnionTech Software Technology Co., Ltd.
+    SPDX-License-Identifier: MIT
+    ]]></copyright>
+
+    <description summary="DDE shell integration for Treeland">
+        This protocol provides DDE desktop components with DDE-specific shell
+        capabilities including surface role management, window overlap
+        detection, active-state notifications, multitask view control, window
+        picking, and lockscreen operations.
+
+        The manager global exposes constructor requests for each feature domain.
+        Each constructor returns a separate protocol object with its own lifetime
+        and state.
+
+        Warning! This protocol is EXPERIMENTAL and under active development.
+        It may change at any time, including in backward-incompatible ways,
+        without incrementing the interface major version and without prior
+        notice. No compatibility guarantees of any kind are provided. Clients
+        and compositors must track the upstream definition in treeland-protocols
+        and must not rely on the current interface names, requests, events, or
+        semantics remaining stable across releases.
+    </description>
+
+    <!-- ============================================================ -->
+    <!-- Manager global                                                -->
+    <!-- ============================================================ -->
+    <interface name="treeland_dde_shell_manager_v2" version="1">
+        <description summary="DDE shell capability manager">
+            This global is a factory for the individual protocol objects that
+            compose the DDE shell integration.  Each get_* request creates an
+            independent object whose lifetime is controlled by the client via
+            its destroy request.
+
+            The client should destroy all child objects before destroying the
+            manager.
+        </description>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the manager">
+                Destroy the treeland_dde_shell_manager_v2 object.
+
+                The client must have already destroyed all objects created
+                through this manager; destroying the manager while child
+                objects still exist is a protocol error.
+            </description>
+        </request>
+
+        <request name="get_window_overlap_checker">
+            <description summary="create a window overlap checker">
+                Create a treeland_window_overlap_checker_v2 object used to
+                monitor whether a given rectangular region is occluded by
+                xdg-shell toplevels.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_window_overlap_checker_v2" summary="the new overlap checker object"/>
+        </request>
+
+        <request name="get_shell_surface">
+            <description summary="create a shell surface for a wl_surface">
+                Create a treeland_dde_shell_surface_v2 for an existing
+                wl_surface.
+
+                At most one shell surface may be associated with a given
+                wl_surface at any time.  Attempting to create a second shell
+                surface for the same wl_surface is a protocol error.
+
+                The shell surface is typically used in conjunction with
+                xdg_surface to add DDE-specific attributes such as overlay
+                roles, skip-switcher hints, and automatic placement.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_dde_shell_surface_v2" summary="the new shell surface object"/>
+            <arg name="surface" type="object" interface="wl_surface" summary="the surface to attach the shell surface to"/>
+        </request>
+
+        <request name="get_dde_active">
+            <description summary="create an active-state watcher">
+                Create a treeland_dde_active_v2 bound to the given seat.  The
+                object emits events when the compositor detects user
+                interaction that affects the DDE active state.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_dde_active_v2" summary="the new active-state watcher"/>
+            <arg name="seat" type="object" interface="wl_seat" summary="the seat to monitor"/>
+        </request>
+
+        <request name="get_multitaskview">
+            <description summary="create a multitask view controller">
+                Create a treeland_multitaskview_v2 that can be used to
+                toggle the multitask (overview) view.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_multitaskview_v2" summary="the new multitask view controller"/>
+        </request>
+
+        <request name="get_window_picker">
+            <description summary="create a window picker">
+                Create a treeland_window_picker_v2 used to request that the
+                user interactively select a window.  After a successful pick
+                the compositor sends a window event with the selected window's
+                process ID.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_window_picker_v2" summary="the new window picker object"/>
+        </request>
+
+        <request name="get_lockscreen">
+            <description summary="create a lockscreen controller">
+                Create a treeland_lockscreen_v2 that provides requests to lock
+                the screen, show the shutdown UI, or initiate a user-switch
+                operation.
+            </description>
+            <arg name="id" type="new_id" interface="treeland_lockscreen_v2" summary="the new lockscreen controller"/>
+        </request>
+
+        <request name="set_xwindow_position_relative">
+            <description summary="position an XWayland window relative to a wl_surface">
+                Request that the compositor move the top-left corner of the
+                XWayland window identified by wid to a position offset by
+                (dx, dy) from the top-left corner of the given anchor surface.
+
+                The compositor will send a done event on the provided
+                wl_callback when the operation completes.  The callback data
+                is 0 on success and 1 on failure.
+            </description>
+            <arg name="callback" type="new_id" interface="wl_callback" summary="callback for completion status"/>
+            <arg name="wid" type="uint" summary="X11 window ID of the XWayland surface"/>
+            <arg name="anchor" type="object" interface="wl_surface" summary="the reference surface"/>
+            <arg name="dx" type="fixed" summary="horizontal offset from the anchor's top-left corner"/>
+            <arg name="dy" type="fixed" summary="vertical offset from the anchor's top-left corner"/>
+        </request>
+
+        <enum name="error">
+            <entry name="child_not_destroyed" value="0"
+                summary="child objects still exist when the manager was destroyed"/>
+        </enum>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- Window overlap checker                                        -->
+    <!-- ============================================================ -->
+    <interface name="treeland_window_overlap_checker_v2" version="1">
+        <description summary="window region overlap detection">
+            A treeland_window_overlap_checker_v2 monitors whether a
+            client-specified rectangular region on a given output is occluded
+            by any xdg-shell toplevel.
+
+            The client calls update to register or re-register the region of
+            interest.  The compositor then sends enter and leave events as the
+            overlap state changes.
+        </description>
+
+        <enum name="anchor" bitfield="true">
+            <description summary="edge flags for positioning the detected region">
+                Bitwise OR of edges that anchor the detected window region to
+                the output.  For example, top | left anchors the region to the
+                top-left corner of the output.
+            </description>
+            <entry name="top" value="1" summary="anchor to the top edge of the output"/>
+            <entry name="bottom" value="2" summary="anchor to the bottom edge of the output"/>
+            <entry name="left" value="4" summary="anchor to the left edge of the output"/>
+            <entry name="right" value="8" summary="anchor to the right edge of the output"/>
+        </enum>
+
+        <enum name="error">
+            <entry name="invalid_output" value="0"
+                summary="the provided output is invalid or has been destroyed"/>
+        </enum>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the overlap checker">
+                Destroy the treeland_window_overlap_checker_v2 object and stop
+                sending enter/leave events.
+            </description>
+        </request>
+
+        <request name="update">
+            <description summary="register or re-register the detected region">
+                Specify the rectangular region to monitor and the output on
+                which it resides.  The region is positioned relative to the
+                output edges indicated by the anchor bitfield.
+
+                The compositor records the window positions at the time this
+                request is processed.  If any monitored window moves
+                afterward, the client must call update again to refresh the
+                overlap state.
+
+                If the previously registered region is still valid, calling
+                update again replaces it atomically.
+            </description>
+            <arg name="width" type="int" summary="width of the detected region in surface-local coordinates"/>
+            <arg name="height" type="int" summary="height of the detected region in surface-local coordinates"/>
+            <arg name="anchor" type="uint" enum="anchor" summary="bitfield of anchor edges"/>
+            <arg name="output" type="object" interface="wl_output" summary="the output on which the region is located"/>
+        </request>
+
+        <event name="enter">
+            <description summary="the detected region is now overlapped">
+                Sent when at least one xdg-shell toplevel begins to overlap
+                the registered region.  Sent at most once per update cycle;
+                the compositor will not send duplicate enter events while the
+                region remains overlapped.
+            </description>
+        </event>
+
+        <event name="leave">
+            <description summary="the detected region is no longer overlapped">
+                Sent when no xdg-shell toplevel overlaps the registered
+                region any more.  Sent at most once per update cycle.
+            </description>
+        </event>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- DDE shell surface                                             -->
+    <!-- ============================================================ -->
+    <interface name="treeland_dde_shell_surface_v2" version="1">
+        <description summary="DDE-specific surface attributes">
+            A treeland_dde_shell_surface_v2 adds DDE shell attributes to a
+            wl_surface, such as an overlay role, automatic placement,
+            skip-switcher hints, and keyboard focus policy.
+
+            The compositor destroys this object automatically when the
+            associated wl_surface is destroyed.  The client must call destroy
+            on the treeland_dde_shell_surface_v2 before destroying the
+            wl_surface; destroying the wl_surface first is a protocol error.
+        </description>
+
+        <enum name="role">
+            <description summary="surface rendering roles">
+                Defines the z-order layer at which the surface is rendered.
+                Currently only the overlay role is available, which places the
+                surface below wlr-layer-shell surfaces at the workspace overlay
+                level.
+
+                Multiple surfaces may share the same role; ordering within a
+                single role is undefined.
+            </description>
+            <entry name="overlay" value="1" summary="overlay role, rendered below layer-shell surfaces"/>
+        </enum>
+
+        <enum name="error">
+            <entry name="no_role" value="0"
+                summary="a role-dependent request was made before set_role"/>
+            <entry name="surface_destroyed" value="1"
+                summary="the associated wl_surface was already destroyed"/>
+        </enum>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the shell surface">
+                Remove the DDE shell surface role from the wl_surface.  The
+                wl_surface becomes unmapped and the shell surface object is
+                destroyed.
+
+                This request must be sent before the wl_surface is destroyed.
+            </description>
+        </request>
+
+        <request name="set_role">
+            <description summary="assign a rendering role to the surface">
+                Assign a role that determines the z-order layer.  The role may
+                be changed at any time before the surface is destroyed.
+            </description>
+            <arg name="role" type="uint" enum="role" summary="the rendering role to assign"/>
+        </request>
+
+        <request name="set_surface_position">
+            <description summary="set the surface position in global coordinates">
+                Move the surface to the given global coordinates.  For example,
+                on a 1920x1080 output starting at (1920, 0), a local position
+                of (50, 50) corresponds to global coordinates (1970, 50).
+
+                This request and set_auto_placement are mutually exclusive;
+                calling set_auto_placement after set_surface_position, or vice
+                versa, is a protocol error.
+            </description>
+            <arg name="x" type="int" summary="x coordinate in global space"/>
+            <arg name="y" type="int" summary="y coordinate in global space"/>
+        </request>
+
+        <request name="set_auto_placement">
+            <description summary="let the compositor position the surface below the cursor">
+                Request that the compositor automatically position the surface
+                horizontally centered under the cursor at the given vertical
+                offset below the cursor's bottom edge.  The compositor also
+                constrains the surface to remain within the output bounds.
+
+                This request and set_surface_position are mutually exclusive;
+                calling set_surface_position after set_auto_placement, or vice
+                versa, is a protocol error.
+            </description>
+            <arg name="y_offset" type="uint" summary="vertical offset below the cursor bottom edge"/>
+        </request>
+
+        <request name="set_skip_switcher">
+            <description summary="set whether the surface should be excluded from the window switcher">
+                When skip is 1 the compositor should omit this surface from
+                window-switcher UI.  When skip is 0 the surface is shown
+                normally.  The default is 0.
+            </description>
+            <arg name="skip" type="uint" summary="0 to show in switcher, 1 to skip"/>
+        </request>
+
+        <request name="set_skip_dock_preview">
+            <description summary="set whether the surface should be excluded from dock previews">
+                When skip is 1 the compositor should omit this surface from
+                dock preview thumbnails.  When skip is 0 the surface is shown
+                normally.  The default is 0.
+            </description>
+            <arg name="skip" type="uint" summary="0 to show in dock preview, 1 to skip"/>
+        </request>
+
+        <request name="set_skip_multitask_view">
+            <description summary="set whether the surface should be excluded from the multitask view">
+                When skip is 1 the compositor should omit this surface from
+                the multitask (overview) view.  When skip is 0 the surface is
+                shown normally.  The default is 0.
+            </description>
+            <arg name="skip" type="uint" summary="0 to show in multitask view, 1 to skip"/>
+        </request>
+
+        <request name="set_accept_keyboard_focus">
+            <description summary="control whether the surface accepts keyboard focus">
+                When accept is 0 the compositor will not give keyboard focus to
+                this surface, even when it is clicked or otherwise activated.
+                When accept is 1 (default) the surface receives keyboard focus
+                normally.
+            </description>
+            <arg name="accept" type="uint" summary="0 to reject keyboard focus, 1 to accept"/>
+        </request>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- DDE active-state watcher                                      -->
+    <!-- ============================================================ -->
+    <interface name="treeland_dde_active_v2" version="1">
+        <description summary="monitor DDE active-state changes">
+            A treeland_dde_active_v2 receives events when the compositor
+            detects user interaction that affects the DDE active state, such as
+            mouse-button presses and scroll-wheel events.
+        </description>
+
+        <enum name="reason">
+            <description summary="what triggered the active-state change">
+                Indicates the type of input that caused the active state to
+                change.
+            </description>
+            <entry name="mouse" value="0" summary="mouse button press"/>
+            <entry name="wheel" value="1" summary="mouse wheel scroll"/>
+        </enum>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the active-state watcher">
+                Destroy the treeland_dde_active_v2 object and stop sending
+                active-state events.
+            </description>
+        </request>
+
+        <event name="active_in">
+            <description summary="the compositor entered an active state">
+                Sent when the user interaction identified by reason causes the
+                compositor to transition into an active state.
+            </description>
+            <arg name="reason" type="uint" enum="reason" summary="what triggered the transition"/>
+        </event>
+
+        <event name="active_out">
+            <description summary="the compositor left an active state">
+                Sent when the compositor transitions out of the active state.
+            </description>
+            <arg name="reason" type="uint" enum="reason" summary="what triggered the transition"/>
+        </event>
+
+        <event name="start_drag">
+            <description summary="a drag operation has started">
+                Sent when the compositor begins a drag-and-drop operation.
+            </description>
+        </event>
+
+        <event name="drop">
+            <description summary="a drag operation has completed">
+                Sent when the compositor completes a drag-and-drop operation,
+                either with a successful drop or a cancellation.
+            </description>
+        </event>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- Multitask view controller                                     -->
+    <!-- ============================================================ -->
+    <interface name="treeland_multitaskview_v2" version="1">
+        <description summary="multitask (overview) view controller">
+            A treeland_multitaskview_v2 allows a client to toggle the
+            multitask (overview) view that displays all open windows.
+        </description>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the multitask view controller">
+                Destroy the treeland_multitaskview_v2 object.  If the
+                multitask view is currently shown it is not automatically
+                dismissed.
+            </description>
+        </request>
+
+        <request name="toggle">
+            <description summary="toggle the multitask view">
+                If the multitask view is currently hidden, show it.  If it is
+                currently shown, hide it.
+            </description>
+        </request>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- Window picker                                                 -->
+    <!-- ============================================================ -->
+    <interface name="treeland_window_picker_v2" version="1">
+        <description summary="interactive window selection">
+            A treeland_window_picker_v2 allows a client to initiate an
+            interactive window-picking session.  After the user selects a
+            window, the compositor sends a window event with the selected
+            window's process ID.
+        </description>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the window picker">
+                Destroy the treeland_window_picker_v2 object and cancel any
+                in-progress picking session.
+            </description>
+        </request>
+
+        <request name="pick">
+            <description summary="start a window-picking session">
+                Request that the compositor enter a picking mode where the user
+                can click on a window.  The hint string may be displayed by
+                the compositor to guide the user.
+
+                Only one picking session may be active at a time per object;
+                calling pick while a previous pick is still pending is a
+                protocol error.
+            </description>
+            <arg name="hint" type="string" summary="human-readable hint text shown to the user during picking"/>
+        </request>
+
+        <event name="window">
+            <description summary="a window was picked">
+                Sent after the user completes a picking session to report the
+                process ID of the selected window.
+            </description>
+            <arg name="pid" type="int" summary="process ID of the picked window"/>
+        </event>
+
+        <enum name="error">
+            <entry name="already_picking" value="0"
+                summary="a pick request is already pending on this object"/>
+        </enum>
+    </interface>
+
+    <!-- ============================================================ -->
+    <!-- Lockscreen controller                                         -->
+    <!-- ============================================================ -->
+    <interface name="treeland_lockscreen_v2" version="1">
+        <description summary="lockscreen and session control">
+            A treeland_lockscreen_v2 provides requests to lock the screen,
+            show the shutdown user interface, or initiate a user-switch
+            operation.
+        </description>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the lockscreen controller">
+                Destroy the treeland_lockscreen_v2 object.  This does not
+                affect an already-locked screen or an already-visible shutdown
+                UI.
+            </description>
+        </request>
+
+        <request name="lock">
+            <description summary="lock the screen">
+                Request that the compositor lock the screen immediately.  The
+                compositor may show a lockscreen surface before accepting
+                further input.
+            </description>
+        </request>
+
+        <request name="shutdown">
+            <description summary="show the shutdown interface">
+                Request that the compositor display the shutdown confirmation
+                UI to the user.
+            </description>
+        </request>
+
+        <request name="switch_user">
+            <description summary="initiate a user-switch operation">
+                Request that the compositor present the user-switch interface
+                or switch directly to a different user session, depending on
+                the compositor's session configuration.
+            </description>
+        </request>
+    </interface>
+</protocol>

@@ -36,7 +36,7 @@
                 Destroys this treeland_wallpaper_notifier_v1 object.
 
                 Destroying a bound treeland_wallpaper_notifier_v1 object while
-                wallpaper surface objects created from it are still alive is
+                wallpaper surface objects are still alive is
                 illegal and will result in a protocol error.
             </description>
         </request>
@@ -149,6 +149,7 @@
                 permanently stop using the wallpaper surface, such as when the
                 client is shutting down or after receiving the
                 treeland_wallpaper_notifier_v1.remove event for this surface.
+                The surface should also have released its wl_buffer attachment.
             </description>
         </request>
 
@@ -170,7 +171,7 @@
                 the specified wallpaper source.
             </description>
 
-            <arg name="error" type="uint" enum="error"
+            <arg name="error" type="uint" enum="treeland_wallpaper_surface_v1.error"
                 summary="The error code indicating the failure reason"/>
         </request>
 
@@ -222,7 +223,7 @@
                 Sets the playback speed of the wallpaper content.
 
                 A rate of 1.0 represents normal speed.
-                A rate of 0.0 represents a paused state.
+                A rate of 0.0 is equivalent to receiving a pause event.
             </description>
             <arg name="rate" type="fixed"
                 summary="Playback rate multiplier"/>

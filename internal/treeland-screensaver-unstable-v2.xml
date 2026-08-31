@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<protocol name="treeland_screensaver_unstable_v1">
+<protocol name="treeland_screensaver_unstable_v2">
     <copyright><![CDATA[
-    SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+    SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
     SPDX-License-Identifier: MIT
     ]]></copyright>
 
@@ -15,7 +15,7 @@
         semantics remaining stable across releases.
     </description>
 
-    <interface name="treeland_screensaver_v1" version="2">
+    <interface name="treeland_screensaver_v2" version="1">
         <description summary="Simple idle inhibit protocol">
             This object implements a simple idle inhibit protocol used
             to implement org.freedesktop.ScreenSaver D-Bus interface.
@@ -32,6 +32,16 @@
             before inhibit to update application_name and reason
             recorded.
         </description>
+
+        <enum name="error">
+            <entry name="not_yet_inhibited" value="0" summary="Trying to uninhibit but no active inhibit existed" />
+            <entry name="already_inhibited" value="1" summary="Trying to inhibit with an active inhibit existed" />
+        </enum>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy treeland_screensaver_v2 object" />
+        </request>
+
         <request name="inhibit">
             <description summary="Inhibit idleness">
                 Inhibit idleness with given application_name and reason_for_inhibit.
@@ -39,17 +49,11 @@
             <arg name="application_name" type="string" summary="name of the application requesting the inhibit"/>
             <arg name="reason_for_inhibit" type="string" summary="human-readable reason for the inhibit request"/>
         </request>
+
         <request name="uninhibit">
             <description summary="Uninhibit idleness">
                 Uninhibit idleness previously inhibited by inhibit request.
             </description>
         </request>
-        <request name="destroy" type="destructor" since="2">
-            <description summary="destroy treeland_screensaver_v1 object" />
-        </request>
-        <enum name="error">
-            <entry name="not_yet_inhibited" value="0" summary="Trying to uninhibit but no active inhibit existed" />
-            <entry name="already_inhibited" value="1" summary="Trying to inhibit with an active inhibit existed" />
-        </enum>
     </interface>
 </protocol>
