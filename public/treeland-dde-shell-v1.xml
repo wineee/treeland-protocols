@@ -227,7 +227,7 @@
             <arg name="skip" type="uint" summary="Boolean value that sets whether to skip the dock preview."/>
         </request>
 
-        <request name="set_skip_muti_task_view">
+        <request name="set_skip_multi_task_view">
             <description summary="make the window not appear in a mutitask view">
                 Setting this bit will indicate that the window prefers not to be listed in a mutitask view.
             </description>

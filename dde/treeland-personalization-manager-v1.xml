@@ -85,8 +85,8 @@
                 Destroy the context object.
             </description>
         </request>
-        <event name="verfity">
-            <description summary="verfity event">
+        <event name="verify">
+            <description summary="verify event">
                 Send this signal after commit cursor configure.
             </description>
             <arg name="success" type="int" summary="check whether the configuration is successful" />
