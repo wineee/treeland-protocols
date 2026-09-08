@@ -30,6 +30,8 @@ set(TREELAND_PROTOCOL_DDE_XML_FILES
   dde/treeland-wallpaper-manager-unstable-v1.xml
   dde/treeland-show-desktop-unstable-v1.xml
   dde/treeland-layer-shell-extension-unstable-v1.xml
+  dde/treeland-session-control-unstable-v1.xml
+  dde/treeland-multitaskview-unstable-v2.xml
 )
 
 # Internal protocol XML files (Treeland-specific, not for general app developers)

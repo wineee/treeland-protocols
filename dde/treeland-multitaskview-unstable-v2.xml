@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="treeland_multitaskview_unstable_v2">
+    <copyright><![CDATA[
+SPDX-FileCopyrightText: 2024 - 2026 UnionTech Software Technology Co., Ltd.
+SPDX-License-Identifier: MIT
+]]></copyright>
+
+    <description summary="multitaskview mode control for treeland">
+        Warning! This protocol is EXPERIMENTAL and under active development.
+        It may change at any time, including in backward-incompatible ways,
+        without incrementing the interface major version and without prior
+        notice. No compatibility guarantees of any kind are provided. Clients
+        and compositors must track the upstream definition in treeland-protocols
+        and must not rely on the current interface names, requests, events, or
+        semantics remaining stable across releases.
+
+        This protocol allows a privileged DDE client such as the dock or shell
+        to control and observe the compositor's multitaskview (workspace
+        overview) mode. In multitaskview mode the compositor presents an
+        overview of all windows and workspaces so the user can switch between
+        them.
+
+        The compositor should reject bind attempts from non-privileged
+        clients.
+
+        The terms "must", "must not", "should", and "may" in this document
+        are to be interpreted as described in RFC 2119.
+    </description>
+
+    <interface name="treeland_multitaskview_v2" version="1">
+        <description summary="multitaskview mode controller">
+            A global that provides read/write access to the compositor's
+            multitaskview mode state.
+
+            The compositor should reject bind attempts from non-privileged
+            clients.
+
+            On binding, the compositor immediately sends a state event
+            carrying the current mode so that the client starts synchronized.
+
+            The client sends set_state to request a mode transition. The
+            compositor applies the transition at its discretion and confirms
+            the new state via a state event. The compositor may also emit
+            state spontaneously when the mode changes through other means
+            (e.g. a keyboard shortcut or gesture).
+        </description>
+
+        <enum name="state">
+            <description summary="multitaskview mode values">
+                Describes the current multitaskview mode.
+            </description>
+            <entry name="normal" value="0" summary="multitaskview is not shown; windows are presented normally" />
+            <entry name="active" value="1" summary="multitaskview overview is shown" />
+        </enum>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the multitaskview controller">
+                Destroy the treeland_multitaskview_v2 object.
+
+                This request does not alter the current multitaskview mode;
+                the compositor retains whatever state was last set.
+            </description>
+        </request>
+
+        <request name="set_state">
+            <description summary="request a multitaskview mode transition">
+                Request that the compositor transition to the given
+                multitaskview mode. The compositor may ignore the request or
+                apply it asynchronously. If the mode changes, the compositor
+                confirms the new state by emitting a state event.
+
+                Sending the same mode that is already active is a no-op; the
+                compositor need not emit a state event in response.
+            </description>
+            <arg name="state" type="uint" enum="state"
+                summary="requested multitaskview state" />
+        </request>
+
+        <event name="state">
+            <description summary="multitaskview mode has changed">
+                Emitted by the compositor whenever the multitaskview mode
+                changes, including once immediately after the client binds
+                this interface to convey the initial state.
+
+                The compositor emits this event both in response to a set_state
+                request and when the mode changes through any other
+                compositor-side mechanism.
+            </description>
+            <arg name="state" type="uint" enum="state"
+                summary="new multitaskview state" />
+        </event>
+    </interface>
+</protocol>

@@ -14,6 +14,8 @@ For DDE desktop components. Installed via `TREELAND_PROTOCOL_DDE_XML_FILES`.
 | `treeland-wallpaper-manager-unstable-v1.xml` | `treeland_wallpaper_manager_unstable_v1` | `treeland_wallpaper_manager_v1`, `treeland_wallpaper_v1` | Per-output wallpaper configuration with image/video sources |
 | `treeland-show-desktop-unstable-v1.xml` | `treeland_show_desktop_unstable_v1` | `treeland_show_desktop_v1` | Show-desktop mode control: request mode transitions and observe compositor-driven state changes |
 | `treeland-layer-shell-extension-unstable-v1.xml` | `treeland_layer_shell_extension_unstable_v1` | `treeland_layer_shell_extension_manager_v1`, `treeland_layer_shell_extension_object_v1` | Compositor-driven interactive resize for layer-shell surfaces (dock / side bar / status bar): begin_resize with seat+serial, per-resize size limits, and rejection reasons |
+| `treeland-session-control-unstable-v1.xml` | `treeland_session_control_unstable_v1` | `treeland_session_control_v1` | Session and power control: lock the screen, show the shutdown/session menu, and switch user |
+| `treeland-multitaskview-unstable-v2.xml` | `treeland_multitaskview_unstable_v2` | `treeland_multitaskview_v2` | Multitaskview (workspace overview) mode control: request mode transitions and observe compositor-driven state changes |
 
 ## Breaking changes
 

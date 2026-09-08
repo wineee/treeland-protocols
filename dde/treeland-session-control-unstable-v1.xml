@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="treeland_session_control_unstable_v1">
+    <copyright><![CDATA[
+SPDX-FileCopyrightText: 2024 - 2026 UnionTech Software Technology Co., Ltd.
+SPDX-License-Identifier: MIT
+]]></copyright>
+
+    <description summary="session and power control for treeland">
+        Warning! This protocol is EXPERIMENTAL and under active development.
+        It may change at any time, including in backward-incompatible ways,
+        without incrementing the interface major version and without prior
+        notice. No compatibility guarantees of any kind are provided. Clients
+        and compositors must track the upstream definition in treeland-protocols
+        and must not rely on the current interface names, requests, events, or
+        semantics remaining stable across releases.
+
+        This protocol allows a privileged DDE client such as the greeter or
+        shell to trigger session and power actions on the compositor: locking
+        the screen, showing the shutdown and session menu, and switching
+        users.
+
+        The compositor should reject bind attempts from non-privileged
+        clients.
+
+        The terms "must", "must not", "should", and "may" in this document
+        are to be interpreted as described in RFC 2119.
+    </description>
+
+    <interface name="treeland_session_control_v1" version="1">
+        <description summary="session and power control">
+            A global that exposes session and power actions to a privileged
+            DDE client.
+
+            The compositor should reject bind attempts from non-privileged
+            clients.
+
+            This interface is stateless: each request is an independent
+            one-shot action. The compositor does not send events in response
+            to these requests; clients that need to observe the resulting
+            session state should use the appropriate session or idle
+            protocols instead.
+        </description>
+
+        <request name="destroy" type="destructor">
+            <description summary="destroy the session control object">
+                Destroy the treeland_session_control_v1 object.
+
+                This request does not alter any session or power state; the
+                compositor retains whatever state was last requested.
+            </description>
+        </request>
+
+        <request name="lock">
+            <description summary="lock the screen">
+                Request that the compositor lock the current session. The
+                compositor may apply the lock asynchronously.
+
+                The compositor should ignore this request while a lock screen
+                is already active.
+            </description>
+        </request>
+
+        <request name="show_shutdown_menu">
+            <description summary="show the shutdown and session menu">
+                Request that the compositor show the shutdown and session
+                menu, letting the user choose a power or session action such
+                as power off, reboot, suspend, hibernate, or log out.
+
+                The compositor should ignore this request while a lock screen
+                is already active.
+            </description>
+        </request>
+
+        <request name="switch_user">
+            <description summary="show the user switch UI">
+                Request that the compositor show the user switch UI, letting
+                the user pick another login session to switch to.
+
+                The compositor should ignore this request while a lock screen
+                is already active.
+            </description>
+        </request>
+    </interface>
+</protocol>

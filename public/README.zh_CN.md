@@ -4,7 +4,7 @@
 
 | 文件 | 协议 | 接口 | 用途 |
 |------|----------|-----------|---------|
-| `treeland-dde-shell-v1.xml` | `treeland_dde_shell_v1` | `treeland_dde_shell_manager_v1`, `treeland_window_overlap_checker`, `treeland_dde_shell_surface_v1`, `treeland_dde_active_v1`, `treeland_multitaskview_v1`, `treeland_window_picker_v1`, `treeland_lockscreen_v1` | DDE Shell 集成：surface 角色、重叠检测、活跃事件、多任务视图、窗口选取、锁屏 |
+| `treeland-dde-shell-v1.xml` | `treeland_dde_shell_v1` | `treeland_dde_shell_manager_v1`, `treeland_window_overlap_checker`, `treeland_dde_shell_surface_v1`, `treeland_dde_active_v1`, `treeland_multitaskview_v1`（已废弃）, `treeland_window_picker_v1`, `treeland_lockscreen_v1`（已废弃） | DDE Shell 集成：surface 角色、重叠检测、活跃事件、窗口选取；已废弃的多任务视图/锁屏接口不可用，分别由 `dde/treeland-multitaskview-unstable-v2.xml` 和 `dde/treeland-session-control-unstable-v1.xml` 取代；整个协议未来将被彻底移除 |
 | `treeland-appearance-unstable-v1.xml` | `treeland_appearance_unstable_v1` | `treeland_appearance_v1` | 查询与订阅用户级外观设置：光标主题/大小、字体、图标主题、强调色、窗口不透明度、配色方案、标题栏高度、圆角 |
 | `treeland-decoration-unstable-v1.xml` | `treeland_decoration_unstable_v1` | `treeland_decoration_manager_v1`, `treeland_decoration_context_v1` | 逐窗口服务端装饰（SSD）定制：圆角、阴影、边框、标题栏可见性；需先经 xdg-decoration 申请 SSD |
 
@@ -28,3 +28,13 @@
 #### `treeland-capture-unstable-v1.xml`
 
 从 `public/` 移除。被上游 `ext-image-capture-source-v1` 和 `ext-image-copy-capture-v1` 取代；此协议已弃用，文件移至 `deprecated/`。消费者应改用上游 `ext-image-capture-*` 协议；旧 XML 在迁移期间仍会安装，但不得用于新代码。
+
+#### `treeland-dde-shell-v1.xml`
+
+`treeland_lockscreen_v1` 与 `treeland_multitaskview_v1` 接口及其创建请求（`get_treeland_lockscreen`、`get_treeland_multitaskview`）现标注为已废弃且不可用：请求无任何效果，也不会发出任何事件。文件暂保留原位；整个 `treeland-dde-shell` 协议计划在未来版本彻底移除。
+
+二者由 `dde/` 下两个新的独立协议取代：
+- `treeland-session-control-unstable-v1.xml`（`treeland_session_control_v1`）：会话与电源控制——`lock`、`show_shutdown_menu`、`switch_user`。
+- `treeland-multitaskview-unstable-v2.xml`（`treeland_multitaskview_v2`）：多任务视图模式控制，状态可观察——`set_state` 请求、`state` 事件、bind 时同步。
+
+消费者应停止经由 `treeland_dde_shell_manager_v1` 获取这些对象，改为直接绑定新的全局对象；已废弃接口不得用于新代码。

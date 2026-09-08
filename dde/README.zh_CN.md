@@ -14,6 +14,8 @@
 | `treeland-wallpaper-manager-unstable-v1.xml` | `treeland_wallpaper_manager_unstable_v1` | `treeland_wallpaper_manager_v1`, `treeland_wallpaper_v1` | 逐输出壁纸配置，支持图片/视频来源 |
 | `treeland-show-desktop-unstable-v1.xml` | `treeland_show_desktop_unstable_v1` | `treeland_show_desktop_v1` | 显示桌面模式控制：请求模式切换并观察合成器驱动的状态变化 |
 | `treeland-layer-shell-extension-unstable-v1.xml` | `treeland_layer_shell_extension_unstable_v1` | `treeland_layer_shell_extension_manager_v1`, `treeland_layer_shell_extension_object_v1` | 合成器驱动的 layer-shell 表面交互式缩放（dock / 侧边栏 / 状态栏）：begin_resize 携带 seat+serial 与单次尺寸限制，及拒绝原因 |
+| `treeland-session-control-unstable-v1.xml` | `treeland_session_control_unstable_v1` | `treeland_session_control_v1` | 会话与电源控制：锁屏、显示关机/会话菜单、切换用户 |
+| `treeland-multitaskview-unstable-v2.xml` | `treeland_multitaskview_unstable_v2` | `treeland_multitaskview_v2` | 多任务视图（工作区概览）模式控制：请求模式切换并观察合成器驱动的状态变化 |
 
 ## 破坏性变更
 

@@ -13,6 +13,14 @@
         and compositors must track the upstream definition in treeland-protocols
         and must not rely on the current interface names, requests, events, or
         semantics remaining stable across releases.
+
+        The treeland_lockscreen_v1 and treeland_multitaskview_v1 interfaces,
+        together with the get_treeland_lockscreen and get_treeland_multitaskview
+        manager requests that create them, are deprecated and non-functional:
+        their requests have no effect and no events are ever emitted. They are
+        superseded by the treeland-session-control-unstable-v1 and
+        treeland-multitaskview-unstable-v2 protocols. This protocol as a whole
+        is slated for removal in a future release.
     </description>
 
     <interface name="treeland_dde_shell_manager_v1" version="2">
@@ -46,7 +54,12 @@
 
         <request name="get_treeland_multitaskview">
             <description summary="create a new multitaskview context">
-                Create a new multitaskview context for toggle.
+                Deprecated: this request is non-functional. The created
+                object's requests have no effect and no events are ever
+                emitted.
+
+                Superseded by the treeland_multitaskview_v2 global of the
+                treeland-multitaskview-unstable-v2 protocol.
             </description>
             <arg name="id" type="new_id" interface="treeland_multitaskview_v1"/>
         </request>
@@ -60,7 +73,12 @@
 
         <request name="get_treeland_lockscreen">
             <description summary="create a new lockscreen context">
-                Create a new lockscreen context for toggle.
+                Deprecated: this request is non-functional. The created
+                object's requests have no effect and no events are ever
+                emitted.
+
+                Superseded by the treeland_session_control_v1 global of the
+                treeland-session-control-unstable-v1 protocol.
             </description>
             <arg name="id" type="new_id" interface="treeland_lockscreen_v1"/>
         </request>
@@ -282,7 +300,17 @@
 
     <interface name="treeland_multitaskview_v1" version="1">
         <description summary="multitaskview context interface">
-            An interface used to control multitaskview.
+            Deprecated: this interface is non-functional. All requests have
+            no effect and no events are ever emitted. New code must not use
+            it.
+
+            Superseded by the treeland_multitaskview_v2 global of the
+            treeland-multitaskview-unstable-v2 protocol, which exposes the
+            multitaskview mode as observable state: a set_state request, a
+            state event, and bind-time state synchronization.
+
+            This interface will be removed along with the whole protocol in
+            a future release.
         </description>
 
         <request name="destroy" type="destructor">
@@ -326,7 +354,17 @@
 
     <interface name="treeland_lockscreen_v1" version="1">
         <description summary="lockscreen interface">
-            An interface used to operate lockscreen.
+            Deprecated: this interface is non-functional. All requests have
+            no effect and no events are ever emitted. New code must not use
+            it.
+
+            Superseded by the treeland_session_control_v1 global of the
+            treeland-session-control-unstable-v1 protocol, which provides
+            lock, show_shutdown_menu, and switch_user as one-shot session
+            and power actions.
+
+            This interface will be removed along with the whole protocol in
+            a future release.
         </description>
 
         <request name="destroy" type="destructor">
