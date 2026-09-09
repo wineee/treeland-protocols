@@ -59,6 +59,8 @@
             </description>
             <entry name="invalid_surface" value="0"
                 summary="the relative_surface passed to get_dock_preview_context is not a valid wl_surface owned by the calling client" />
+            <entry name="context_already_exists" value="1"
+                summary="get_dock_preview_context was called for a surface that already has an active dock preview context; the client must destroy the existing context first" />
         </enum>
 
         <request name="destroy" type="destructor">
@@ -97,11 +99,11 @@
                 and tooltip positioning.
 
                 Only one dock preview context may be active per surface at a
-                time. If a new context is created for a surface that already
-                has one, the compositor destroys the previous context.
-
-                The context is destroyed by calling
-                treeland_dock_preview_context_v2.destroy.
+                time. If the surface already has an active context, the client
+                must destroy it via treeland_dock_preview_context_v2.destroy
+                before creating a new one; otherwise the compositor raises the
+                context_already_exists protocol error and does not create the
+                requested object.
             </description>
             <arg name="relative_surface" type="object" interface="wl_surface"
                 summary="anchor surface for preview and tooltip positioning" />
