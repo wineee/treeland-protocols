@@ -92,7 +92,7 @@
 
 1. 协议重命名为 `treeland_shortcut_manager_unstable_v3`；接口重命名为 `treeland_shortcut_manager_v3` 和 `treeland_shortcut_capture_v3`。
 2. 管理器接口版本从 3 重置为 1，并移除所有 `since` 属性（这些属性标记的是 v2 接口第 2、3 版新增的成员：`capture_next_shortcut`、`invalid_surface` 错误以及 `tile_left`/`tile_right` action）。
-3. `action` 枚举重新编号：所有枚举值整体前移一位（`notify` 现为 0，`tile_right` 现为 28）；未增删枚举项。
+3. `action` 枚举重构并重新编号：移除 `quit` 与 `taskswitch_enter`（`quit` 不再作为快捷键暴露；任务切换器由 `taskswitch_next`/`taskswitch_prev` 动作隐式进入）；直接切换集合由 `workspace_1`..`workspace_6` 扩展为 `workspace_1`..`workspace_12`；新增 14 个动作——`minimize`、`resize_window`、`move_window_to_prev_workspace`、`move_window_to_next_workspace`、`zoom_in`/`zoom_out`/`zoom_reset`，以及贴边 snap 家族 `tile_top`/`tile_bottom`/`tile_top_left`/`tile_top_right`/`tile_bottom_left`/`tile_bottom_right`。各项按逻辑族重新分组（notify、工作区切换、窗口状态、窗口操作、跨工作区移动、显示桌面/多任务、任务切换、贴边、屏幕缩放、系统），因此所有动作值均变更；`notify` 现为 0，`shutdown_menu` 现为 45。部分新增动作未必已被所有合成器构建实现；绑定此类动作会被接受，但在实现前无效果。
 4. 移除 commit 机制：`bind_key`、`bind_swipe_gesture`、`bind_hold_gesture` 立即生效，被拒绝的绑定通过新增的 `bind_failure` 事件逐个报告，`commit` 请求、`commit_success` 与 `commit_failure` 事件以及 `error.invalid_commit` 枚举项不复存在。`error.invalid_surface` 枚举项从 4 重编号为 3。与旧模型不同，单个绑定失败不再回滚同批次的其他绑定。
 5. 文档完善（无线缆变更）：销毁管理器对象现明确说明会隐式释放经由 `acquire` 获取的独占控制权；`capture_next_shortcut` 请求与捕获接口语义重写以对齐合成器实现（触发时机、seat/focus 校验、`busy`/`aborted` 失败条件及有效快捷键规则）。
 

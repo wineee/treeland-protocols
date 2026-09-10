@@ -77,35 +77,62 @@
                 compositor-side operation, the compositor emits an activated
                 event on this interface so the client can respond.
             </description>
-            <entry name="notify"                 value="0"  summary="emit an activated event to the client" />
-            <entry name="workspace_1"            value="1"  summary="switch to workspace 1" />
-            <entry name="workspace_2"            value="2"  summary="switch to workspace 2" />
-            <entry name="workspace_3"            value="3"  summary="switch to workspace 3" />
-            <entry name="workspace_4"            value="4"  summary="switch to workspace 4" />
-            <entry name="workspace_5"            value="5"  summary="switch to workspace 5" />
-            <entry name="workspace_6"            value="6"  summary="switch to workspace 6" />
-            <entry name="prev_workspace"         value="7"  summary="switch to the previous workspace" />
-            <entry name="next_workspace"         value="8"  summary="switch to the next workspace" />
-            <entry name="show_desktop"           value="9"  summary="toggle show-desktop mode" />
-            <entry name="maximize"               value="10" summary="maximize the active window" />
-            <entry name="cancel_maximize"        value="11" summary="restore the active window from maximized state" />
-            <entry name="move_window"            value="12" summary="enter window move mode for the active window" />
-            <entry name="close_window"           value="13" summary="close the active window" />
-            <entry name="show_window_menu"       value="14" summary="show the window menu for the active window" />
-            <entry name="open_multitask_view"    value="15" summary="open the multitask overview" />
-            <entry name="close_multitask_view"   value="16" summary="close the multitask overview" />
-            <entry name="toggle_multitask_view"  value="17" summary="toggle the multitask overview" />
-            <entry name="toggle_fps_display"     value="18" summary="toggle the compositor FPS overlay" />
-            <entry name="lockscreen"             value="19" summary="lock the screen" />
-            <entry name="shutdown_menu"          value="20" summary="show the shutdown/session menu" />
-            <entry name="quit"                   value="21" summary="quit the compositor" />
-            <entry name="taskswitch_enter"       value="22" summary="open the task switcher" />
-            <entry name="taskswitch_next"        value="23" summary="select the next task in the switcher" />
-            <entry name="taskswitch_prev"        value="24" summary="select the previous task in the switcher" />
-            <entry name="taskswitch_sameapp_next" value="25" summary="select the next window of the same application in the switcher" />
-            <entry name="taskswitch_sameapp_prev" value="26" summary="select the previous window of the same application in the switcher" />
-            <entry name="tile_left"              value="27" summary="tile the active window to the left half of the screen" />
-            <entry name="tile_right"             value="28" summary="tile the active window to the right half of the screen" />
+            <!-- notify -->
+            <entry name="notify"                   value="0"  summary="emit an activated event to the client" />
+            <!-- workspace switching -->
+            <entry name="workspace_1"              value="1"  summary="switch to workspace 1" />
+            <entry name="workspace_2"              value="2"  summary="switch to workspace 2" />
+            <entry name="workspace_3"              value="3"  summary="switch to workspace 3" />
+            <entry name="workspace_4"              value="4"  summary="switch to workspace 4" />
+            <entry name="workspace_5"              value="5"  summary="switch to workspace 5" />
+            <entry name="workspace_6"              value="6"  summary="switch to workspace 6" />
+            <entry name="workspace_7"              value="7"  summary="switch to workspace 7" />
+            <entry name="workspace_8"              value="8"  summary="switch to workspace 8" />
+            <entry name="workspace_9"              value="9"  summary="switch to workspace 9" />
+            <entry name="workspace_10"             value="10" summary="switch to workspace 10" />
+            <entry name="workspace_11"             value="11" summary="switch to workspace 11" />
+            <entry name="workspace_12"             value="12" summary="switch to workspace 12" />
+            <entry name="prev_workspace"           value="13" summary="switch to the previous workspace" />
+            <entry name="next_workspace"           value="14" summary="switch to the next workspace" />
+            <!-- window state -->
+            <entry name="maximize"                 value="15" summary="maximize the active window" />
+            <entry name="cancel_maximize"          value="16" summary="restore the active window from maximized state" />
+            <entry name="minimize"                 value="17" summary="minimize the active window" />
+            <!-- window operations -->
+            <entry name="move_window"               value="18" summary="enter window move mode for the active window" />
+            <entry name="resize_window"             value="19" summary="enter window resize mode for the active window" />
+            <entry name="close_window"              value="20" summary="close the active window" />
+            <entry name="show_window_menu"          value="21" summary="show the window menu for the active window" />
+            <!-- move window across workspaces -->
+            <entry name="move_window_to_prev_workspace" value="22" summary="move the active window to the previous workspace" />
+            <entry name="move_window_to_next_workspace" value="23" summary="move the active window to the next workspace" />
+            <!-- show desktop / multitask -->
+            <entry name="show_desktop"              value="24" summary="toggle show-desktop mode" />
+            <entry name="open_multitask_view"      value="25" summary="open the multitask overview" />
+            <entry name="close_multitask_view"     value="26" summary="close the multitask overview" />
+            <entry name="toggle_multitask_view"    value="27" summary="toggle the multitask overview" />
+            <!-- task switching -->
+            <entry name="taskswitch_next"          value="28" summary="select the next task in the switcher" />
+            <entry name="taskswitch_prev"          value="29" summary="select the previous task in the switcher" />
+            <entry name="taskswitch_sameapp_next"  value="30" summary="select the next window of the same application in the switcher" />
+            <entry name="taskswitch_sameapp_prev"  value="31" summary="select the previous window of the same application in the switcher" />
+            <!-- window tiling (snap family) -->
+            <entry name="tile_left"                 value="32" summary="tile the active window to the left half of the screen" />
+            <entry name="tile_right"                value="33" summary="tile the active window to the right half of the screen" />
+            <entry name="tile_top"                  value="34" summary="tile the active window to the top half of the screen" />
+            <entry name="tile_bottom"               value="35" summary="tile the active window to the bottom half of the screen" />
+            <entry name="tile_top_left"             value="36" summary="tile the active window to the top-left quarter of the screen" />
+            <entry name="tile_top_right"            value="37" summary="tile the active window to the top-right quarter of the screen" />
+            <entry name="tile_bottom_left"          value="38" summary="tile the active window to the bottom-left quarter of the screen" />
+            <entry name="tile_bottom_right"         value="39" summary="tile the active window to the bottom-right quarter of the screen" />
+            <!-- screen zoom -->
+            <entry name="zoom_in"                   value="40" summary="zoom in the screen" />
+            <entry name="zoom_out"                  value="41" summary="zoom out the screen" />
+            <entry name="zoom_reset"                value="42" summary="reset the screen zoom level" />
+            <!-- system / misc -->
+            <entry name="toggle_fps_display"        value="43" summary="toggle the compositor FPS overlay" />
+            <entry name="lockscreen"               value="44" summary="lock the screen" />
+            <entry name="shutdown_menu"            value="45" summary="show the shutdown/session menu" />
         </enum>
 
         <enum name="keybind_flag" bitfield="true">
