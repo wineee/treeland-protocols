@@ -1,3 +1,20 @@
+treeland-protocols (0.6.0) unstable; urgency=medium
+
+  * feat(layer-shell-extension): add treeland layer shell extension
+    protocol
+  * feat: add treeland-output-manager unstable-v2 protocol
+  * refactor: replace shortcut-manager-v2 with unstable-v3
+  * feat: add foreign-toplevel-manager unstable-v2 protocol
+  * refactor: split personalization-manager-v1 into 3 protocols
+  * feat: split show-desktop protocol from window-management
+  * feat: add virtual_output_modified event to virtual output protocol
+  * refactor: adopt unstable-v2 naming for internal protocols
+  * refactor: normalize wine protocol and interface names
+  * deprecate: move treeland-capture-unstable-v1 to deprecated/
+  * deprecate: move treeland-ddm-v1 to deprecated/
+
+ -- rewine <luhongxu@deepin.org>  Thu, 10 Sep 2026 19:36:09 +0800
+
 treeland-protocols (0.5.10) unstable; urgency=medium
 
   * protocols: mark all treeland protocols as experimental with no
